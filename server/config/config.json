@@ -1,0 +1,11 @@
+
+{
+  "development": {
+    "username": "rootuser",
+    "password": "mysecret123",
+    "database": "ticketdb",
+    "host": "172.17.0.1", 
+    "dialect": "postgres",
+    "port": 5433
+  }
+}
