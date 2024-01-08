@@ -16,6 +16,15 @@ export const createTicket = async (values) => {
   }
 };
 
+export const getTickets = async (values) => {
+  try {
+    return await axiosInstance("").get("user/tickets");
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
 export const userSignup = async (values) => {
   try {
     return await axiosInstance("").post("user/register", { ...values });

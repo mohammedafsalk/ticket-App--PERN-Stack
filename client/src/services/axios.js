@@ -11,8 +11,13 @@ const axiosInstance = () => {
   });
 
   instance.interceptors.response.use(
-    (response) => response,
-    (error) => Promise.reject(error.response.data)
+    (response) => {
+      return response;
+    },
+    (error) => {
+      console.error("Error:", error.response);
+      return Promise.reject(error.response);
+    }
   );
 
   return instance;
