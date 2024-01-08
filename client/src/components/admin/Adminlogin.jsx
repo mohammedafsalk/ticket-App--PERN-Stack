@@ -24,7 +24,6 @@ export default function Adminlogin() {
     const { email, password } = formdata;
     const values = { email, password };
     let { data } = await adminLogin(values);
-
     if (data.success) {
       setRefresh();
     } else {

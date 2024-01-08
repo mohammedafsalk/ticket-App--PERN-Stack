@@ -1,24 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Container, Grid, Paper, Typography } from "@mui/material";
 import {
   GarageOutlined,
   MonetizationOnOutlined,
   PeopleAltOutlined,
 } from "@mui/icons-material";
-import { adminLogout } from "../../services/admin";
+import { adminLogout, getDetails } from "../../services/admin";
 import { useAuth } from "../../context/context";
+import DataTable from "./Table";
 const AdminHome = () => {
-  const { setRefresh } = useAuth();
+  const [datas, setDatas] = useState([]);
+  const [userCount, setUserCount] = useState("");
+  const { setRefresh, refresh } = useAuth();
+
+  const closed = datas.filter((item) => item.status === "Closed");
+
+
+
   const handleLogout = async () => {
     let { data } = await adminLogout();
-    console.log(data);
     setRefresh();
   };
 
+  useEffect(() => {
+    (async function () {
+      let { data } = await getDetails();
+      setDatas(data.tickets);
+      setUserCount(data.userCount);
+    })();
+  }, [refresh]);
+
   return (
     <div className="min-h-screen max-w-[1280px] mx-auto flex flex-col">
-      {/* Navbar */}
-
       <nav className="bg-gray-800 p-4 text-white flex justify-between items-center">
         <div className="text-lg font-bold">Admin Panel</div>
         <div className="flex items-center space-x-4">
@@ -31,7 +44,7 @@ const AdminHome = () => {
         </div>
       </nav>
 
-      <Container sx={{ marginTop: 5 }}>
+      <Container sx={{ marginTop: 5, marginBottom: 5 }}>
         <Grid
           container
           direction="row"
@@ -60,7 +73,7 @@ const AdminHome = () => {
               />
               <Box textAlign="center">
                 <Typography variant="h5" fontWeight={500}>
-                  Users
+                  {userCount}
                 </Typography>
                 <Typography
                   variant="h6"
@@ -89,14 +102,14 @@ const AdminHome = () => {
               <GarageOutlined sx={{ color: "#DA3E40" }} fontSize="large" />
               <Box textAlign="center">
                 <Typography variant="h5" fontWeight={500}>
-                  Users
+                  {datas.length}
                 </Typography>
                 <Typography
                   variant="h6"
                   fontWeight={300}
                   className="text-gray-400"
                 >
-                  Total Users
+                  Total Tickets
                 </Typography>
               </Box>
             </Paper>
@@ -118,20 +131,21 @@ const AdminHome = () => {
               <PeopleAltOutlined sx={{ color: "#DD9167" }} fontSize="large" />
               <Box textAlign="center">
                 <Typography variant="h5" fontWeight={500}>
-                  Users
+                  {closed.length}
                 </Typography>
                 <Typography
                   variant="h6"
                   fontWeight={300}
                   className="text-gray-400"
                 >
-                  Total Users
+                  Closed tickets
                 </Typography>
               </Box>
             </Paper>
           </Grid>
         </Grid>
       </Container>
+      <DataTable datas={datas} />
     </div>
   );
 };
