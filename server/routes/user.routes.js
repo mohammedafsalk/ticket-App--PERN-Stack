@@ -6,6 +6,7 @@ const {
   logout,
   createTicket,
   getAssignees,
+  getTickets,
 } = require("../controllers/user.controller");
 const rateLimit = require("express-rate-limit");
 const authCheck = require("../middleware/userAuth.middleware");
@@ -27,6 +28,7 @@ router.post("/login", limiter, login);
 router.get("/logout", logout);
 router.get("/check", authCheck, check);
 router.post("/create", authCheck,createTicket );
+router.get("/tickets", authCheck, getTickets);
 router.get("/assignees", authCheck,getAssignees );
 
 module.exports = router;

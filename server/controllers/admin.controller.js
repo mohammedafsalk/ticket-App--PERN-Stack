@@ -58,25 +58,35 @@ function logout(req, res) {
     .json({ message: "logged out", error: false });
 }
 
-async function getUsers(req, res, next) {
+async function getDetails(req, res, next) {
   try {
-    const users = await db.User.findAll({
+    const userCount = await db.User.count({
       where: {
         email: {
           [db.Sequelize.Op.ne]: process.env.ADMINMAIL,
         },
       },
-      attributes: { exclude: ["password"] },
     });
 
-    res.json({ success: true, users });
+    const ticketData = await db.Ticket.findAll();
+    const tickets = ticketData.map((ticket) => ticket.dataValues);
+
+    res.json({ success: true, userCount, tickets });
   } catch (error) {
     next(error);
   }
 }
 
-async function requestTicket(req, res, next) {
+async function updateTicket(req, res, next) {
   try {
+    const { value, id } = req.body.value;
+    const ticket = await db.Ticket.findByPk(id);
+    if (!ticket)
+      return res
+        .status(404)
+        .json({ success: false, message: "Ticket not found" });
+    await ticket.update({ status: value });
+    res.json({ success: true, message: "Updated ticket" });
   } catch (error) {
     next(error);
   }
@@ -95,5 +105,6 @@ module.exports = {
   login,
   check,
   logout,
-  getUsers,
+  getDetails,
+  updateTicket,
 };

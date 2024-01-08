@@ -5,11 +5,11 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Ticket extends Model {
     static associate(models) {
-      Ticket.belongsTo(models.user, {
+      Ticket.belongsTo(models.User, {
         as: "requestedByUser",
         foreignKey: "requestedId",
       });
-      Ticket.belongsTo(models.user, {
+      Ticket.belongsTo(models.User, {
         as: "assigneeUser",
         foreignKey: "assigneeId",
       });

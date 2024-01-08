@@ -1,6 +1,7 @@
 const db = require("../db");
 const bcrypt = require("bcryptjs");
 const generateAccessToken = require("../helpers/token.helper");
+const ticket = require("../models/ticket");
 
 async function register(req, res, next) {
   try {
@@ -144,11 +145,34 @@ async function getAssignees(req, res, next) {
   }
 }
 
+async function getTickets(req, res, next) {
+  try {
+    const { id } = req.user;
+    const tickets = await db.Ticket.findAll({
+      where: {
+        requestedId: id,
+      },
+    });
+    const assgnedTickets = await db.Ticket.findAll({
+      where: {
+        assigneeId: id,
+      },
+    });
+    const ticketsDataValues = tickets.map((ticket) => ticket.dataValues);
+    const assignedValues = assgnedTickets.map((ticket) => ticket.dataValues);
+    res.json({ success: true, ticketsDataValues ,assignedValues});
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+}
+
 module.exports = {
   register,
   login,
   authCheck,
   createTicket,
+  getTickets,
   getAssignees,
   logout,
 };
