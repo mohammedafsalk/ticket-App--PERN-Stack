@@ -1,8 +1,8 @@
 import React, { createContext, useReducer, useContext } from "react";
 
 const initialState = {
-  user: { login: false },
-  admin: { login: false },
+  user: { login: null },
+  admin: { login: null },
   refresh: false,
 };
 

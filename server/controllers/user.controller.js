@@ -1,7 +1,9 @@
 const db = require("../db");
 const bcrypt = require("bcryptjs");
 const generateAccessToken = require("../helpers/token.helper");
-const ticket = require("../models/ticket");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 async function register(req, res, next) {
   try {
@@ -132,6 +134,9 @@ async function getAssignees(req, res, next) {
         id: {
           [db.Sequelize.Op.not]: id,
         },
+        email: {
+          [db.Sequelize.Op.ne]: process.env.ADMINMAIL,
+        },
       },
     });
     const userDetails = assignees.map((user) => ({
@@ -160,7 +165,7 @@ async function getTickets(req, res, next) {
     });
     const ticketsDataValues = tickets.map((ticket) => ticket.dataValues);
     const assignedValues = assgnedTickets.map((ticket) => ticket.dataValues);
-    res.json({ success: true, ticketsDataValues ,assignedValues});
+    res.json({ success: true, ticketsDataValues, assignedValues });
   } catch (error) {
     console.log(error);
     next(error);
