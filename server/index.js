@@ -1,24 +1,28 @@
 const express = require("express");
 const cors = require("cors");
 const cookieparser = require("cookie-parser");
-const userAuthRoute = require("./routes/authuser.routes");
-const adminAuthRoute = require("./routes/authadmin.router");
+const userAuthRoute = require("./routes/user.routes");
+const adminAuthRoute = require("./routes/admin.router");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cookieparser());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with the actual URL of your frontend application
+    credentials: true,
+  })
+);
 
 //Routes
-app.use("/api/user/auth", userAuthRoute);
-app.use("/api/admin/auth", adminAuthRoute);
+app.use("/api/user/", userAuthRoute);
+app.use("/api/admin/", adminAuthRoute);
 
 //Error handler
 app.use((err, req, res, next) => {
-  console.error(err);
-  const msg = err.message || "Internal Server Error";
+  const msg = err || "Internal Server Error";
   res.status(500).json({
     success: false,
     message: msg,

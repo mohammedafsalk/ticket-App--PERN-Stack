@@ -5,6 +5,7 @@ const generateAccessToken = require("../helpers/token.helper");
 async function register(req, res, next) {
   try {
     const { name, email, password } = req.body;
+    console.log(req.body);
     // Validate input
     if (!name || !email || !password) {
       return res
@@ -86,13 +87,68 @@ function logout(req, res) {
     .json({ message: "logged out", error: false });
 }
 
-function sample(req, res) {
-  console.log(req.user, "controller");
+function authCheck(req, res) {
+  const user = req.user;
+  try {
+    res.json({ loggedIn: true, user });
+  } catch (error) {
+    res.json({ loggedIn: false });
+  }
+}
+
+async function createTicket(req, res, next) {
+  try {
+    const {
+      requested_by,
+      requestedId,
+      subject,
+      status,
+      dueDate,
+      assignee,
+      assigneeId,
+    } = req.body;
+    const newTicket = await db.Ticket.create({
+      requested_by,
+      requestedId,
+      subject,
+      status,
+      due_date: dueDate,
+      assignee,
+      assigneeId,
+    });
+    newTicket.save();
+    res.json({ success: true, message: "Ticket created successfully" });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getAssignees(req, res, next) {
+  try {
+    const { id } = req.user;
+    const assignees = await db.User.findAll({
+      where: {
+        id: {
+          [db.Sequelize.Op.not]: id,
+        },
+      },
+    });
+    const userDetails = assignees.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    }));
+    res.json({ success: true, userDetails });
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = {
   register,
   login,
-  sample,
-  logout
+  authCheck,
+  createTicket,
+  getAssignees,
+  logout,
 };

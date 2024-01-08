@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-async function login(req, res) {
+async function login(req, res, next) {
   try {
     const { email, password } = req.body;
 
@@ -58,13 +58,42 @@ function logout(req, res) {
     .json({ message: "logged out", error: false });
 }
 
-function sample(req, res) {
-  const admin = req.admin;
-  res.json({ admin });
+async function getUsers(req, res, next) {
+  try {
+    const users = await db.User.findAll({
+      where: {
+        email: {
+          [db.Sequelize.Op.ne]: process.env.ADMINMAIL,
+        },
+      },
+      attributes: { exclude: ["password"] },
+    });
+
+    res.json({ success: true, users });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function requestTicket(req, res, next) {
+  try {
+  } catch (error) {
+    next(error);
+  }
+}
+
+function check(req, res, next) {
+  const admin = req.admin || null;
+  try {
+    return res.json({ admin, loggedIn: true });
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = {
   login,
-  sample,
+  check,
   logout,
+  getUsers,
 };

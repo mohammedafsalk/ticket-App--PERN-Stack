@@ -7,7 +7,7 @@ async function authCheck(req, res, next) {
     if (!token) {
       return res.json({
         loggedIn: false,
-        err: true,
+        success: false,
         message: "No Token Found",
       });
     }
@@ -16,14 +16,13 @@ async function authCheck(req, res, next) {
       attributes: { exclude: ["password"] },
     });
     if (!user) {
-      return res.json({ loggedIn: false });
+      return res.json({ loggedIn: false, success: false });
     }
     req.user = user.dataValues;
     next();
   } catch (error) {
     console.log(error.message);
     res.json({
-      error: error,
       message: "Something Went Wrong",
       loggedIn: false,
     });
