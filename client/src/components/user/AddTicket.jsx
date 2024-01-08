@@ -22,7 +22,7 @@ const style = {
 };
 
 export default function AddTicket({ open, handleClose, assignees }) {
-  const { user } = useAuth();
+  const { user, setRefresh } = useAuth();
 
   const [subject, setSubject] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -41,7 +41,7 @@ export default function AddTicket({ open, handleClose, assignees }) {
     let { data } = await createTicket(values);
     if (data.success) {
       handleClose();
-
+      setRefresh();
       message.success(data.message);
     } else {
       message.error(data.message);

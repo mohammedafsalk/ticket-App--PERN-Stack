@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { AccountCircle, EventNote } from "@mui/icons-material";
-import { Container, Tab, Tabs, Chip } from "@mui/material";
+import { Container, Tab, Tabs, Avatar } from "@mui/material";
 import AddTicket from "./AddTicket";
 import { getAssignees, getTickets, userLogout } from "../../services/user";
 import { useAuth } from "../../context/context";
 import Tickets from "./Tickets";
 import AssignedTickets from "./AssignedTickets";
 
+const getInitials = (name) => {
+  return name
+    .split(" ")
+    .map((word) => word[0])
+    .join("");
+};
+
 export default function UsrHome() {
-  const { setRefresh } = useAuth();
+  const { setRefresh, refresh, user } = useAuth();
   const [value, setValue] = React.useState(0);
   const [open, setOpen] = useState(false);
   const [assignees, setAssignees] = useState([]);
@@ -16,6 +23,8 @@ export default function UsrHome() {
   const [assingedTickets, setAssignedTickets] = useState([]);
 
   const handleClose = () => setOpen(false);
+
+  const initials = getInitials(user.details.name);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -38,12 +47,17 @@ export default function UsrHome() {
       setTickets(data.ticketsDataValues);
       setAssignedTickets(data.assignedValues);
     })();
-  }, []);
+  }, [refresh]);
   return (
     <>
       <div className="min-h-screen max-w-[1280px] mx-auto flex flex-col">
         <nav className="bg-blue-400 p-4 text-white flex justify-between items-center">
           <div className="text-lg font-bold">Ticket App</div>
+          <div className="flex gap-3 justify-center items-center">
+            <Avatar>{initials}</Avatar>
+            <div className="text-lg font-bold">{user.details.name}</div>
+          </div>
+
           <div className="flex items-center space-x-4">
             <button
               className="bg-orange-500 text-white px-3 py-1 rounded"
