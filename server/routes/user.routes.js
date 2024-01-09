@@ -12,6 +12,7 @@ const rateLimit = require("express-rate-limit");
 const authCheck = require("../middleware/userAuth.middleware");
 const router = express.Router();
 
+//Rate limitter for preventing unwanted requests
 const limiter = rateLimit({
   windowMs: 60000,
   max: 5,

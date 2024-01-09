@@ -33,7 +33,10 @@ async function login(req, res, next) {
         .status(400)
         .json({ success: false, message: "Password is incorrect" });
 
+    //Generating acces token for admin
     const accessToken = generateAccessToken(admin);
+
+    //Storing the access token in cookies and sending the response
     res
       .cookie("adminToken", accessToken, {
         httpOnly: true,
@@ -43,11 +46,13 @@ async function login(req, res, next) {
       })
       .json({ success: true, accessToken, admin });
   } catch (error) {
+    // Passing the error to the error handler middleware
     next(error);
   }
 }
 
 function logout(req, res) {
+  //Clearing the admins token from cookies
   res
     .cookie("adminToken", "", {
       httpOnly: true,
@@ -60,6 +65,7 @@ function logout(req, res) {
 
 async function getDetails(req, res, next) {
   try {
+    // Counting the number of users (excluding the admin)
     const userCount = await db.User.count({
       where: {
         email: {
@@ -68,26 +74,41 @@ async function getDetails(req, res, next) {
       },
     });
 
+    // Fetching all ticket data from the database
     const ticketData = await db.Ticket.findAll();
+
+    // Extracting data values from the fetched ticket data
     const tickets = ticketData.map((ticket) => ticket.dataValues);
 
+    // Sending the response with the retrieved user count and ticket details
     res.json({ success: true, userCount, tickets });
   } catch (error) {
+    // Passing the error to the error handler middleware
     next(error);
   }
 }
 
 async function updateTicket(req, res, next) {
   try {
+    // Destructuring values from the request body
     const { value, id } = req.body.value;
+
+    // Finding the ticket in the database by its primary key (id)
     const ticket = await db.Ticket.findByPk(id);
+
+    // Checking if the ticket exists
     if (!ticket)
       return res
         .status(404)
         .json({ success: false, message: "Ticket not found" });
+
+    // Updating the status of the ticket with the provided value
     await ticket.update({ status: value });
+
+    // Sending a success response after updating the ticket
     res.json({ success: true, message: "Updated ticket" });
   } catch (error) {
+    // Passing the error to the error handler middleware
     next(error);
   }
 }

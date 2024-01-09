@@ -6,7 +6,9 @@ import AdminRoutes from "./routes/AdminRoutes";
 export default function App() {
   return (
     <Routes>
+      {/* Route for User routes */}
       <Route path="/*" element={<UserRoutes />} />
+      {/* Route for Admin routes */}
       <Route path="/admin/*" element={<AdminRoutes />} />
     </Routes>
   );

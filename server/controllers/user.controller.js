@@ -36,6 +36,7 @@ async function register(req, res, next) {
       user: newUser,
     });
   } catch (error) {
+    //Passing the error to error handler
     next(error);
   }
 }
@@ -65,7 +66,10 @@ async function login(req, res, next) {
         .status(400)
         .json({ success: false, message: "Password is incorrect" });
 
+    //Generating usertoken
     const accessToken = generateAccessToken(user);
+
+    //Storing the access token in cookie and sending response
     res
       .cookie("userToken", accessToken, {
         httpOnly: true,
@@ -75,11 +79,13 @@ async function login(req, res, next) {
       })
       .json({ success: true, accessToken, user });
   } catch (error) {
+    //Passing the error to error handler
     next(error);
   }
 }
 
 function logout(req, res) {
+  //Removing usertoken from cookie
   res
     .cookie("userToken", "", {
       httpOnly: true,
@@ -101,6 +107,7 @@ function authCheck(req, res) {
 
 async function createTicket(req, res, next) {
   try {
+    //Getting the ticket details from client
     const {
       requested_by,
       requestedId,
@@ -110,6 +117,8 @@ async function createTicket(req, res, next) {
       assignee,
       assigneeId,
     } = req.body;
+
+    //Creating the ticket
     const newTicket = await db.Ticket.create({
       requested_by,
       requestedId,
@@ -119,16 +128,20 @@ async function createTicket(req, res, next) {
       assignee,
       assigneeId,
     });
+    //Saving the ticket
     newTicket.save();
     res.json({ success: true, message: "Ticket created successfully" });
   } catch (error) {
+    //Passing the error to error handler
     next(error);
   }
 }
 
 async function getAssignees(req, res, next) {
   try {
+    // Extracting the user id from the request object
     const { id } = req.user;
+    // Fetching assignees by the user
     const assignees = await db.User.findAll({
       where: {
         id: {
@@ -139,35 +152,48 @@ async function getAssignees(req, res, next) {
         },
       },
     });
+
+    // Extracting data values from the assignees
     const userDetails = assignees.map((user) => ({
       id: user.id,
       name: user.name,
       email: user.email,
     }));
+    // Sending the response with the retrieved assignees data
     res.json({ success: true, userDetails });
   } catch (error) {
+    //Passing the error to error handler
     next(error);
   }
 }
 
 async function getTickets(req, res, next) {
   try {
+    // Extracting the user id from the request object
     const { id } = req.user;
+    // Fetching tickets requested by the user
     const tickets = await db.Ticket.findAll({
       where: {
         requestedId: id,
       },
     });
+    // Fetching tickets assigned to the user
     const assgnedTickets = await db.Ticket.findAll({
       where: {
         assigneeId: id,
       },
     });
+
+    // Extracting data values from the requested tickets
     const ticketsDataValues = tickets.map((ticket) => ticket.dataValues);
+
+    // Extracting data values from the assigned tickets
     const assignedValues = assgnedTickets.map((ticket) => ticket.dataValues);
+
+    // Sending the response with the retrieved ticket data
     res.json({ success: true, ticketsDataValues, assignedValues });
   } catch (error) {
-    console.log(error);
+    //Passing the error to error handler
     next(error);
   }
 }

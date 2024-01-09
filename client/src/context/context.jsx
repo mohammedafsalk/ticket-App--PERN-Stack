@@ -1,15 +1,18 @@
 import React, { createContext, useReducer, useContext } from "react";
 
+// Initial state for the authentication context
 const initialState = {
   user: { login: null },
   admin: { login: null },
   refresh: false,
 };
 
+// Action types
 const SET_USER = "SET_USER";
 const SET_ADMIN = "SET_ADMIN";
 const SET_REFRESH = "SET_REFRESH";
 
+// Reducer function to handle state changes
 const userReducer = (state, action) => {
   switch (action.type) {
     case SET_USER:
@@ -29,6 +32,7 @@ const authContext = createContext();
 const ContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(userReducer, initialState);
 
+  // Action creators to dispatch actions to the reducer
   const setUser = (user) => {
     dispatch({ type: SET_USER, payload: user });
   };
